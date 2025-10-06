@@ -1,33 +1,37 @@
-    <?php
+<?php
 
-    use Illuminate\Support\Facades\Route;
-    use App\Http\Controllers\ClienteController;
-    use App\Http\Controllers\EstabelecimentoController;
-    use App\Http\Controllers\ContaBancariaController;
-    use App\Http\Controllers\UserController;
-    use App\Http\Controllers\DashboardController;
-    // admin apenas
-    Route::middleware(['auth', 'is_admin'])->group(function () {
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\EstabelecimentoController;
+use App\Http\Controllers\ContaBancariaController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
+// admin apenas
+Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::resource('usuarios', UserController::class);
-    });
-    // Redireciona home
-    Route::get('/', function () {
+    Route::get('/contas/exportar', [UserController::class, 'exportarCsv'])
+        ->name('usuarios.exportar');
+});
+// Redireciona home
+Route::get('/', function () {
     return redirect()->route('dashboard');
-    });
-    Route::middleware(['auth'])->group(function () {
+});
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    });
+});
 
-    // Rotas protegidas
-    Route::middleware(['auth'])->group(function () {
+// Rotas protegidas
+Route::middleware(['auth'])->group(function () {
     Route::get('/clientes', [ClienteController::class, 'index'])->name('clientes.index');
     Route::get('/clientes/search', [ClienteController::class, 'search'])->name('clientes.search');
-    
+
     Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
     Route::post('/clientes', [ClienteController::class, 'store'])->name('clientes.store');
     Route::get('/clientes/{cliente}/edit', [ClienteController::class, 'edit'])->name('clientes.edit');
     Route::put('/clientes/{cliente}', [ClienteController::class, 'update'])->name('clientes.update');
     Route::delete('/clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+    Route::get('/clientes/exportar', [ClienteController::class, 'exportarCsv'])
+        ->name('clientes.exportar');
 
     // Estabelecimentos
     Route::get('/estabelecimentos', [EstabelecimentoController::class, 'index'])->name('estabelecimentos.index');
@@ -37,8 +41,11 @@
     Route::put('/estabelecimentos/{estabelecimento}', [EstabelecimentoController::class, 'update'])->name('estabelecimentos.update');
     Route::delete('/estabelecimentos/{estabelecimento}', [EstabelecimentoController::class, 'destroy'])->name('estabelecimentos.destroy');
     Route::get('/estabelecimentos/search', [EstabelecimentoController::class, 'search'])
-    ->name('estabelecimentos.search');
-    
+        ->name('estabelecimentos.search');
+    Route::get('/estabelecimentos/exportar', [EstabelecimentoController::class, 'exportarCsv'])
+        ->name('estabelecimentos.exportar');
+
+
     // Contas
     Route::get('/contas', [ContaBancariaController::class, 'index'])->name('contas.index');
     Route::get('/contas/create', [ContaBancariaController::class, 'create'])->name('contas.create');
@@ -48,6 +55,8 @@
     Route::delete('/contas/{conta}', [ContaBancariaController::class, 'destroy'])->name('contas.destroy');
     // Rota do meu autocomplete
     Route::get('/contas/autocomplete', [ContaBancariaController::class, 'autocomplete'])->name('contas.autocomplete');
+    Route::get('/ContaBancaria/exportar', [ContaBancariaController::class, 'exportarCsv'])
+        ->name('contas.exportar');
 
-    });
-    require __DIR__.'/auth.php';
+});
+require __DIR__ . '/auth.php';

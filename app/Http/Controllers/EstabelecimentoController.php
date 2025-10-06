@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Estabelecimento;
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 class EstabelecimentoController extends Controller
 {
@@ -14,7 +15,7 @@ class EstabelecimentoController extends Controller
 
         if ($request->filled('search')) {
             $query->where('nome_fantasia', 'ilike', "%{$request->search}%")
-                  ->orWhere('cnpj', 'ilike', "%{$request->search}%");
+                ->orWhere('cnpj', 'ilike', "%{$request->search}%");
         }
 
         $estabelecimentos = $query->orderBy('id', 'Asc')->paginate(10);
@@ -65,17 +66,32 @@ class EstabelecimentoController extends Controller
         return redirect()->route('estabelecimentos.index')->with('success', 'Estabelecimento excluído com sucesso!');
     }
     public function search(Request $request)
-{
-    $term = $request->get('term', '');
+    {
+        $term = $request->get('term', '');
 
-    $results = Estabelecimento::where('nome_fantasia', 'ilike', "%{$term}%")
-        ->orWhere('cnpj', 'ilike', "%{$term}%")
-        ->limit(10)
-        ->get(['id', 'nome_fantasia', 'cnpj']);
+        $results = Estabelecimento::where('nome_fantasia', 'ilike', "%{$term}%")
+            ->orWhere('cnpj', 'ilike', "%{$term}%")
+            ->limit(10)
+            ->get(['id', 'nome_fantasia', 'cnpj']);
 
-    return response()->json($results);
-}
+        return response()->json($results);
+    }
+    public function exportarCsv()
+    {
+        $Estabelecimentos = \App\Models\Estabelecimento::all(['nome_fantasia', 'razao_social', 'cnpj', 'cliente_id']);
 
+        $csv = "nome_fantasia;razao_social;cnpj;";
+        foreach ($Estabelecimentos as $e) {
+            $csv .= "{$e->nome_fantasia};{$e->razao_social};{$e->cnpj};{$e->type};{$e->crcliente_ideated_at}\n";
+        }
+
+        $filename = 'Estabelecimentos_' . now()->format('Ymd_His') . '.csv';
+
+        return Response::make($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$filename}",
+        ]);
+    }
 
 
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 
 class ClienteController extends Controller
 {
@@ -27,19 +28,22 @@ class ClienteController extends Controller
     {
         $term = $request->get('term', '');
 
-        if (strlen($term) < 3) { 
+        if (strlen($term) < 3) {
             return response()->json([]);
         }
 
         $results = Cliente::whereRaw('LOWER(nome) LIKE ?', ['%' . strtolower($term) . '%'])
             ->orderBy('nome')
             ->limit(10)
-            ->pluck('nome'); 
+            ->pluck('nome');
 
         return response()->json($results);
     }
 
-    public function create() { return view('clientes.create'); }
+    public function create()
+    {
+        return view('clientes.create');
+    }
 
     public function store(Request $request)
     {
@@ -56,7 +60,10 @@ class ClienteController extends Controller
         return redirect()->route('clientes.index')->with('success', 'Cliente criado com sucesso!');
     }
 
-    public function edit(Cliente $cliente) { return view('clientes.edit', compact('cliente')); }
+    public function edit(Cliente $cliente)
+    {
+        return view('clientes.edit', compact('cliente'));
+    }
 
     public function update(Request $request, Cliente $cliente)
     {
@@ -78,4 +85,21 @@ class ClienteController extends Controller
         $cliente->delete();
         return redirect()->route('clientes.index')->with('success', 'Cliente excluído com sucesso!');
     }
+    public function exportarCsv()
+    {
+        $Cliente = \App\Models\Cliente::all(['nome', 'cpf_cnpj', 'email', 'telefone', 'endereco']);
+
+        $csv = "nome;cpf_cnpj;email;telefone;endereco;";
+        foreach ($Cliente as $e) {
+            $csv .= "{$e->nome};{$e->cpf_cnpj};{$e->email};{$e->telefone};{$e->endereco};\n";
+        }
+
+        $filename = 'Cliente_' . now()->format('Ymd_His') . '.csv';
+
+        return Response::make($csv, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename={$filename}",
+        ]);
+    }
+
 }

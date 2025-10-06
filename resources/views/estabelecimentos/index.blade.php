@@ -86,6 +86,10 @@
                 class="bg-indigo-500 text-white font-bold px-4 py-2 rounded-lg shadow-md hover:bg-indigo-600 transition duration-200 transform hover:scale-[1.02] flex items-center">
                 <i class="fas fa-building mr-2"></i> Criar Novo Estabelecimento
             </a>
+                   <a href="{{ route('estabelecimentos.exportar') }}"
+            class="bg-green-500 text-white font-bold px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-200 transform hover:scale-[1.02] flex items-center">
+            <i class="fas fa-file-csv mr-2"></i> Exportar CSV
+        </a>
         @endif
 
         @if(request('search'))
