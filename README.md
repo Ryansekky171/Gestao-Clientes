@@ -26,7 +26,8 @@ php artisan db:seed
 
 Acesso:
 Acesse no navegador: http://localhost:8000
-Login Admin Padrão: admin@exemplo.com / password
+Login Admin Padrão: admin@gmail.com / admin
+Login Usuario comum: comum1@gmail.com / 123456
 
 Observações:
 - Execute os comandos de configuração, migração e seed dentro do container 'app'.
